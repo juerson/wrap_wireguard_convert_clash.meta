@@ -42,6 +42,8 @@ public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo= # 这里warp的PublicKe
 udp: true
 ```
 
+注：本配置的信息，参考了[这个网站](https://wiki.metacubex.one/config/proxies/wg/)
+
 #### 四、windows中双击`run.bat`文件或执行`python main.py`命令运行
 
 #### 五、生成[clash.yaml](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/clash.yaml)文件就是你需要的clash配置文件，导入 [clash verge](https://github.com/clash-verge-rev/clash-verge-rev) 或绝版 [clash_for_windows_pkg](https://archive.org/download/clash_for_windows_pkg) 使用即可。
