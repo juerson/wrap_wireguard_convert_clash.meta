@@ -46,6 +46,6 @@ udp: true
 
 #### 五、生成[clash.yaml](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/clash.yaml)文件就是你需要的clash配置文件，导入 [clash verge](https://github.com/clash-verge-rev/clash-verge-rev) 或绝版 [clash_for_windows_pkg](https://archive.org/download/clash_for_windows_pkg) 使用即可。
 
-注意：`clash_for_windows_pkg`软件中使用，貌似不支持wriegroud协议的节点，需要将clash内核换成[clash.meta](https://github.com/MetaCubeX/mihomo/releases/tag/v1.16.0)的内核，才支持wiregroud协议的节点。
+注意：原来的`clash_for_windows_pkg`软件，貌似不支持wriegroud协议的节点，需要将clash内核换成[clash.meta](https://github.com/MetaCubeX/mihomo/releases/tag/v1.16.0)的内核，才支持wiregroud协议的节点。
 
 大概路径在`Clash.for.Windows-0.20.39-win\resources\static\files\win\x64`下的`clash-win64.exe`程序换成 [clash.meta](https://github.com/MetaCubeX/mihomo/releases/download/v1.16.0/clash.meta-windows-amd64-cgo-v1.16.0.zip) 的。(这个你会吧，就是把 [clash.meta](https://github.com/MetaCubeX/mihomo/releases/download/v1.16.0/clash.meta-windows-amd64-cgo-v1.16.0.zip) 的内核下载下来，解压重命名为clash-win64.exe，然后复制/剪切到前面提到的路径中，把原来的clash-win64.exe程序替换掉，重启Clash for Windows)
