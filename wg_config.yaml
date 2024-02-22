@@ -1,0 +1,10 @@
+name: "wg-warp"
+type: wireguard
+private-key: OOrigZsSjw2YaY4urjbbU4/BNOZKXqW6EYNm8XKLtkU= # 这里修改成你的PrivateKey
+server: 162.159.192.1
+port: 2480
+ip: 172.16.0.2 # 注意没有后面的"/32"
+ipv6: 2606:4700:110:82ce:bdeb:e72d:572a:e280 # 这里修改成的你的ipv6 Address，注意没有后面的"/128"
+public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo= # 这里warp的PublicKey都是相同的
+# reserved: [209,98,59]  # 可选参数，字符串格式也是合法的，如"U4An"
+udp: true
