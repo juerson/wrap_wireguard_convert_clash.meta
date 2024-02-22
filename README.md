@@ -27,14 +27,14 @@
    pip3 install PyYAML
    ```
 
-#### 二、修改 wg_config.yaml 里面的配置信息
+#### 二、修改[wg_config.yaml](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/wg_config.yaml)里面的配置信息
 
 ```
 name: "wg-warp"
 type: wireguard
 private-key: OOrigZsSjw2YaY4urjbbU4/BNOZKXqW6EYNm8XKLtkU= # 这里修改成你的PrivateKey
 server: 162.159.192.1
-port: 2480
+port: 2408
 ip: 172.16.0.2 # 注意没有后面的"/32"
 ipv6: 2606:4700:110:82ce:bdeb:e72d:572a:e280 # 这里修改成你的ipv6 Address，注意没有后面的"/128"
 public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo= # 这里warp的PublicKey都是相同的，
@@ -44,7 +44,7 @@ udp: true
 
 #### 四、windows中双击`run.bat`文件或执行`python main.py`命令运行
 
-#### 五、生成[clash.yaml](https://github.com/juerson/worker_vless_convert_clash/blob/master/clash.yaml)文件就是你需要的clash配置文件，导入 [clash verge](https://github.com/clash-verge-rev/clash-verge-rev) 或绝版 [clash_for_windows_pkg](https://archive.org/download/clash_for_windows_pkg) 使用即可。
+#### 五、生成[clash.yaml](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/clash.yaml)文件就是你需要的clash配置文件，导入 [clash verge](https://github.com/clash-verge-rev/clash-verge-rev) 或绝版 [clash_for_windows_pkg](https://archive.org/download/clash_for_windows_pkg) 使用即可。
 
 注意：`clash_for_windows_pkg`软件中使用，貌似不支持wriegroud协议的节点，需要将clash内核换成[clash.meta](https://github.com/MetaCubeX/mihomo/releases/tag/v1.16.0)的内核，才支持wiregroud协议的节点。
 
