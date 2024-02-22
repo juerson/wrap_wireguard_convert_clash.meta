@@ -37,7 +37,7 @@ server: 162.159.192.1
 port: 2408
 ip: 172.16.0.2 # 注意没有后面的"/32"
 ipv6: 2606:4700:110:82ce:bdeb:e72d:572a:e280 # 这里修改成你的ipv6 Address，注意没有后面的"/128"
-public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo= # 这里warp的PublicKey都是相同的，
+public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo= # 这里warp的PublicKey都是相同的
 # reserved: [209,98,59]  # 可选参数，字符串格式也是合法的，如"U4An"
 udp: true
 ```
@@ -49,3 +49,7 @@ udp: true
 注意：原来的`clash_for_windows_pkg`软件，貌似不支持wriegroud协议的节点，需要将clash内核换成[clash.meta](https://github.com/MetaCubeX/mihomo/releases/tag/v1.16.0)的内核，才支持wiregroud协议的节点。
 
 大概路径在`Clash.for.Windows-0.20.39-win\resources\static\files\win\x64`下的`clash-win64.exe`程序换成 [clash.meta](https://github.com/MetaCubeX/mihomo/releases/download/v1.16.0/clash.meta-windows-amd64-cgo-v1.16.0.zip) 的。(这个你会吧，就是把 [clash.meta](https://github.com/MetaCubeX/mihomo/releases/download/v1.16.0/clash.meta-windows-amd64-cgo-v1.16.0.zip) 的内核下载下来，解压重命名为clash-win64.exe，然后复制/剪切到前面提到的路径中，把原来的clash-win64.exe程序替换掉，重启Clash for Windows)
+
+由于[clash verge](https://github.com/clash-verge-rev/clash-verge-rev) 新开发，可能会出现延迟超时、无法上网等问题，不知道是`clash verge`软件中内置的`clash.meta`更名`mihomo`内核问题，还是`clash verge`客户端问题。
+
+推荐使用 [clash_for_windows_pkg](https://archive.org/download/clash_for_windows_pkg) + [clash.meta v1.16.0 内核](https://github.com/MetaCubeX/mihomo/releases/download/v1.16.0/clash.meta-windows-amd64-cgo-v1.16.0.zip) ，如果英文界面使用不方便，可以使用[Clash for Windows V0.20.39 汉化版](https://github.com/Z-Siqi/Clash-for-Windows_Chinese/releases/tag/CFW-V0.20.39_CN)，貌似不用更换内核，使用原来的`Clash Premium`内核，是支持`wireguard`协议的 Clash 配置文件。
