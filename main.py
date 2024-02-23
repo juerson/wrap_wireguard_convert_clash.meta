@@ -1,17 +1,17 @@
+import random
+
 import yaml
 import logging
 import os
 import ipaddress
 
-FILES = ["wg_config.yaml", "rules.txt"]
+FILES = ["resources/wg_config.yaml", "resources/rules.txt"]
 BASE_CONFIG = r"""mode: rule
 port: 7890
 socks-port: 7891
 allow-lan: false
 log-level: info
-secret: ''
-unified-delay: true
-external-controller: :9097
+external-controller: :9090
 global-client-fingerprint: chrome
 dns:
   enable: true
@@ -19,21 +19,10 @@ dns:
   ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
-  default-nameserver:
-    - 223.5.5.5
-    - 8.8.8.8
-    - 1.1.1.1
-  nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-  fallback:
-    - https://1.0.0.1/dns-query
-    - tls://dns.google
-  fallback-filter:
-    geoip: true
-    geoip-code: CN
-    ipcidr:
-      - 240.0.0.0/4
+  default-nameserver: ["223.5.5.5", "8.8.8.8", "1.1.1.1"]
+  nameserver: ["https://dns.alidns.com/dns-query", "https://doh.pub/dns-query"]
+  fallback: ["https://1.0.0.1/dns-query", "tls://dns.google"]
+  fallback-filter: {"geoip": true, "geoip-code": "CN", "ipcidr": ["240.0.0.0/4"]}
 """
 PROXY_GROUPS = {
     "select_group": """  - name: 🔰 节点选择
@@ -185,45 +174,53 @@ def generate_ips_from_cidr(cidr):
 
 
 if __name__ == '__main__':
-    port = 2408  # 写入配置的，全部都用这个端口
+    # 随机的端口的列表
+    ports = [854, 859, 864, 878, 880, 890, 891, 894, 903, 908, 928, 934, 939, 942, 943, 945, 946, 955, 968, 987, 988,
+             1002, 1010, 1014, 1018, 1070, 1074, 1180, 1387, 1843, 2371, 2506, 3138, 3476, 3581, 3854, 4177, 4198, 4233,
+             5279, 5956, 7103, 7152, 7156, 7281, 7559, 8319, 8742, 8854, 8886, 2408, 500, 4500, 1701]
     # 设置日志记录器的配置
     logging.basicConfig(level=logging.ERROR)
     handler = FileHandler()
     conf = handler.read_yaml_info(FILES[0])
     RULES = handler.read_txt_rules(FILES[1])
-    cidrs = [
-        "188.114.96.0/24",
-        "188.114.97.0/24",
-        "188.114.98.0/24",
-        "188.114.99.0/24",
-        "162.159.192.0/24",
-        "162.159.193.0/24",
-        "162.159.195.0/24",
-    ]
-    ips = []
-    for cidr in cidrs:
-        ips.extend([str(ip) for ip in generate_ips_from_cidr(cidr)])
+    default_port = conf.get("port")
+    try:
+        if int(default_port) in ports:
+            port = default_port  # 如果配置文件中有端口且是cf udp的端口，就使用配置文件中的端口
+        else:
+            raise ValueError
+    except ValueError:
+        port = random.choice(ports)  # 如果配置文件中的端口不合法，就从ports列表中随机选择一个
+    # 使用嵌套列表，便于拆分数据，使用不同的文件保存
+    cidrs_li = [["188.114.96.0/24", "188.114.97.0/24", "188.114.98.0/24", "188.114.99.0/24"],
+                ["162.159.192.0/24", "162.159.193.0/24", "162.159.195.0/24"]]
+    index = 0
     if conf and RULES:  # 读取到的内容合法，才执行下面的步骤
-        node_names = []
-        node_li = ["proxies:\n", ]
-        for server in ips:
-            name = f"{server}:{port}"
-            conf["name"] = name
-            conf["server"] = server
-            conf["port"] = port
-            node_names.append(name)
-            node_info_str = f"  - {str(conf).replace(": True", ": true").replace(": False", ": false")}\n"
-            node_li.append(node_info_str)
-        node_names = [f"      - {item}" for item in node_names]
-        proxy_groups_string = ""
-        proxies = "".join(node_li)
-        for k, v in PROXY_GROUPS.items():
-            if k in ["select_group", "auto_group", "netflix_group", "homeless_exile_group", "telegram_group",
-                     "microsoft_group", "apple_group", "foreign_media_group"]:
-                proxy_groups_string += (v + "\n".join(node_names) + "\n")  # 这个添加节点名称
-            else:
-                proxy_groups_string += v  # 这个不需要添加节点名称
-        # 构建clash的全部信息
-        clash_content = BASE_CONFIG + proxies + "proxy-groups:\n" + proxy_groups_string + RULES
-        with open("clash.yaml", mode="w", encoding="utf-8") as wf:
-            wf.write(clash_content)
+        for cidrs in cidrs_li:
+            index += 1
+            ips = []
+            for cidr in cidrs:
+                ips.extend({str(ip) for ip in generate_ips_from_cidr(cidr)})  # 使用集合，打乱生成IP的顺序
+            node_names = []
+            node_li = ["proxies:\n", ]
+            for server in ips:
+                name = f"{server}:{port}"
+                conf["name"] = name
+                conf["server"] = server
+                conf["port"] = port
+                node_names.append(name)
+                node_info_str = "  - {}\n".format(str(conf).replace(": True", ": true").replace(": False", ": false"))
+                node_li.append(node_info_str)
+            node_names = [f"      - {item}" for item in node_names]
+            proxy_groups_string = ""
+            proxies = "".join(node_li)
+            for k, v in PROXY_GROUPS.items():
+                if k in ["select_group", "auto_group", "netflix_group", "homeless_exile_group", "telegram_group",
+                         "microsoft_group", "apple_group", "foreign_media_group"]:
+                    proxy_groups_string += (v + "\n".join(node_names) + "\n")  # 这个添加节点名称
+                else:
+                    proxy_groups_string += v  # 这个不需要添加节点名称
+            # 构建clash的全部信息
+            clash_content = BASE_CONFIG + proxies + "proxy-groups:\n" + proxy_groups_string + RULES
+            with open("warp-clash{}.yaml".format(index), mode="w", encoding="utf-8") as wf:
+                wf.write(clash_content)

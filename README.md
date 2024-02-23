@@ -27,17 +27,17 @@
    pip3 install PyYAML
    ```
 
-#### 二、修改[wg_config.yaml](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/wg_config.yaml)里面的配置信息
+#### 二、修改[resources/wg_config.yaml]里面的配置信息
 
 ```
 name: "wg-warp"
 type: wireguard
-private-key: OOrigZsSjw2YaY4urjbbU4/BNOZKXqW6EYNm8XKLtkU= # 这里修改成你的PrivateKey
+private-key: OOrigZsSjw2YaY4urjbbU4/BNOZKXqW6EYNm8XKLtkU=  # 这里修改成你的PrivateKey
 server: 162.159.192.1
-port: 2408
-ip: 172.16.0.2 # 注意没有后面的"/32"
-ipv6: 2606:4700:110:82ce:bdeb:e72d:572a:e280 # 这里修改成你的ipv6 Address，注意没有后面的"/128"
-public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo= # 这里warp的PublicKey都是相同的
+port: ""  # 这里的端口为空或不是WARP UDP端口的，程序会随机选择一个端口
+ip: 172.16.0.2  # 注意没有后面的"/32"
+ipv6: 2606:4700:110:82ce:bdeb:e72d:572a:e280  # 这里修改成的你的ipv6 Address，注意没有后面的"/128"
+public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=  # 这里warp的PublicKey都是相同的
 # reserved: [209,98,59]  # 可选参数，字符串格式也是合法的，如"U4An"
 udp: true
 ```
@@ -46,7 +46,7 @@ udp: true
 
 #### 四、windows中双击`run.bat`文件或执行`python main.py`命令运行
 
-#### 五、生成[clash.yaml](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/clash.yaml)文件就是你需要的clash配置文件，导入 [clash verge](https://github.com/clash-verge-rev/clash-verge-rev) 或绝版 [clash_for_windows_pkg](https://archive.org/download/clash_for_windows_pkg) 使用即可。
+#### 五、生成`warp-clash.yaml`文件就是你需要的clash配置文件，导入 [clash verge](https://github.com/clash-verge-rev/clash-verge-rev) 或绝版 [clash_for_windows_pkg](https://archive.org/download/clash_for_windows_pkg) 使用即可。
 
 注意：原来的`clash_for_windows_pkg`软件，貌似不支持`wriegroud`协议的节点，需要将clash内核换成[clash.meta](https://github.com/MetaCubeX/mihomo/releases/tag/v1.16.0)的内核，才支持`wiregroud`协议的节点。
 
