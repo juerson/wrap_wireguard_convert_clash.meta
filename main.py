@@ -5,26 +5,7 @@ import logging
 import os
 import ipaddress
 
-FILES = ["resources/wg_config.yaml", "resources/rules.txt"]
-BASE_CONFIG = r"""mode: rule
-port: 7890
-socks-port: 7891
-allow-lan: false
-log-level: info
-external-controller: :9090
-global-client-fingerprint: chrome
-dns:
-  enable: true
-  listen: :53
-  default-nameserver: [223.5.5.5, 119.29.29.29]
-  ipv6: false
-  enhanced-mode: fake-ip
-  fake-ip-filter: ["*.n.n.srv.nintendo.net", +.stun.playstation.net, xbox.*.*.microsoft.com, "*.msftncsi.com", "*.msftconnecttest.com", WORKGROUP, "*.lan", stun.*.*.*, stun.*.*, time.windows.com, time.nist.gov, time.apple.com, time.asia.apple.com, "*.ntp.org.cn", "*.openwrt.pool.ntp.org", time1.cloud.tencent.com, time.ustc.edu.cn, pool.ntp.org, ntp.ubuntu.com, "*.*.xboxlive.com", speedtest.cros.wr.pvp.net]
-  nameserver: [tls://223.5.5.5:853, https://223.6.6.6/dns-query, https://120.53.53.53/dns-query]
-  nameserver-policy: {+.tmall.com: 223.5.5.5, +.taobao.com: 223.5.5.5, +.alicdn.com: 223.5.5.5, +.aliyun.com: 223.5.5.5, +.alipay.com: 223.5.5.5, +.alibaba.com: 223.5.5.5, +.qq.com: 119.29.29.29, +.tencent.com: 119.29.29.29, +.weixin.com: 119.29.29.29, +.qpic.cn: 119.29.29.29, +.jd.com: 119.29.29.29, +.bilibili.com: 119.29.29.29, +.hdslb.com: 119.29.29.29, +.163.com: 119.29.29.29, +.126.com: 119.29.29.29, +.126.net: 119.29.29.29, +.127.net: 119.29.29.29, +.netease.com: 119.29.29.29, +.baidu.com: 223.5.5.5, +.bdstatic.com: 223.5.5.5, +.bilivideo.+: 119.29.29.29, +.iqiyi.com: 119.29.29.29, +.douyinvod.com: 180.184.1.1, +.douyin.com: 180.184.1.1, +.douyincdn.com: 180.184.1.1, +.douyinpic.com: 180.184.1.1, +.feishu.cn: 180.184.1.1}
-  fallback: [tls://101.101.101.101:853,https://101.101.101.101/dns-query, https://public.dns.iij.jp/dns-query, https://208.67.220.220/dns-query]
-  fallback-filter: {geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32, 127.0.0.1/32], domain: [+.google.com, +.facebook.com, +.twitter.com, +.youtube.com, +.xn--ngstr-lra8j.com, +.google.cn, +.googleapis.cn, +.googleapis.com, +.gvt1.com, +.paoluz.com, +.paoluz.link, +.paoluz.xyz, +.sodacity-funk.xyz, +.nloli.xyz,+.jsdelivr.net, +.proton.me]}
-"""
+FILES = ["resources/wireguard-config.yaml", "resources/clash-header.yaml", "resources/clash-rules.yaml"]
 PROXY_GROUPS = {
     "select_group": """  - name: 🔰 节点选择
     type: select
@@ -152,7 +133,7 @@ class FileHandler:
                 self.logger.error(f"读取server文件时发生错误： {e}")
                 return None
 
-    def read_txt_rules(self, file_path):
+    def read_clash_config_file(self, file_path):
         # 验证文件路径
         if not os.path.exists(file_path):
             self.logger.error(f"文件不存在： {file_path}")
@@ -162,10 +143,10 @@ class FileHandler:
             try:
                 data = f.read()
                 if not data:
-                    self.logger.error(f"rules.txt文件为空！")
+                    self.logger.error(f"{file_path}文件为空！")
                 return data
             except Exception as e:
-                self.logger.error(f"读取rules文件时发生错误： {e}")
+                self.logger.error(f"读取{file_path}时发生错误： {e}")
                 return None
 
 
@@ -182,9 +163,10 @@ if __name__ == '__main__':
     # 设置日志记录器的配置
     logging.basicConfig(level=logging.ERROR)
     handler = FileHandler()
-    conf = handler.read_yaml_info(FILES[0])
-    RULES = handler.read_txt_rules(FILES[1])
-    default_port = conf.get("port")
+    wireguard_config = handler.read_yaml_info(FILES[0])
+    CLASH_HEADER = handler.read_clash_config_file(FILES[1])
+    CLASH_RULES = handler.read_clash_config_file(FILES[2])
+    default_port = wireguard_config.get("port")
     try:
         if int(default_port) in ports:
             port = default_port  # 如果配置文件中有端口且是cf udp的端口，就使用配置文件中的端口
@@ -196,7 +178,7 @@ if __name__ == '__main__':
     cidrs_li = [["188.114.96.0/24", "188.114.97.0/24", "188.114.98.0/24", "188.114.99.0/24"],
                 ["162.159.192.0/24", "162.159.193.0/24", "162.159.195.0/24"]]
     index = 0
-    if conf and RULES:  # 读取到的内容合法，才执行下面的步骤
+    if wireguard_config and CLASH_HEADER:  # 读取到的内容合法，才执行下面的步骤
         for cidrs in cidrs_li:
             index += 1
             ips = []
@@ -206,11 +188,12 @@ if __name__ == '__main__':
             node_li = ["proxies:\n", ]
             for server in ips:
                 name = f"{server}:{port}"
-                conf["name"] = name
-                conf["server"] = server
-                conf["port"] = port
+                wireguard_config["name"] = name
+                wireguard_config["server"] = server
+                wireguard_config["port"] = port
                 node_names.append(name)
-                node_info_str = "  - {}\n".format(str(conf).replace(": True", ": true").replace(": False", ": false"))
+                node_info_str = "  - {}\n".format(
+                    str(wireguard_config).replace(": True", ": true").replace(": False", ": false"))
                 node_li.append(node_info_str)
             node_names = [f"      - {item}" for item in node_names]
             proxy_groups_string = ""
@@ -221,7 +204,12 @@ if __name__ == '__main__':
                     proxy_groups_string += (v + "\n".join(node_names) + "\n")  # 这个添加节点名称
                 else:
                     proxy_groups_string += v  # 这个不需要添加节点名称
+            # 确保proxies前面的哪行是空行，防止拼接字符串时出问题
+            CLASH_HEADER = CLASH_HEADER if CLASH_HEADER.split("\n")[-1] == "" else CLASH_HEADER + "\n"
             # 构建clash的全部信息
-            clash_content = BASE_CONFIG + proxies + "proxy-groups:\n" + proxy_groups_string + RULES
+            clash_content = CLASH_HEADER + proxies + "proxy-groups:\n" + proxy_groups_string
+            # 如果规则存在，就将内容追加到最后
+            if CLASH_RULES:
+                clash_content += CLASH_RULES
             with open("warp-clash{}.yaml".format(index), mode="w", encoding="utf-8") as wf:
                 wf.write(clash_content)

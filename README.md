@@ -27,7 +27,7 @@
    pip3 install PyYAML
    ```
 
-#### 二、修改 [resources/wg_config.yaml ](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/resources/wg_config.yaml)里面的配置信息
+#### 二、修改 [resources/wg_config.yaml ](https://github.com/juerson/wrap_wireguard_convert_clash.meta/blob/master/resources/wireguard-config.yaml)里面的配置信息
 
 ```
 name: "wg-warp"
